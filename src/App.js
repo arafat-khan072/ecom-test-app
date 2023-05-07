@@ -10,6 +10,7 @@ import { AuthContext } from "./context/AuthProvider";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Organization from "./pages/Organization";
 import Register from "./pages/Register";
 
 function App() {
@@ -36,6 +37,14 @@ function App() {
             element={
               <RequireAuth>
                 <Dashboard />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path={`/organization`}
+            element={
+              <RequireAuth>
+                <Organization />
               </RequireAuth>
             }
           />
