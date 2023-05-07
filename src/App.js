@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import "./App.css";
 import { AuthContext } from "./context/AuthProvider";
+import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -27,6 +28,14 @@ function App() {
             element={
               <RequireAuth>
                 <Home />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path={`/dashboard`}
+            element={
+              <RequireAuth>
+                <Dashboard />
               </RequireAuth>
             }
           />

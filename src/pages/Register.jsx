@@ -1,6 +1,5 @@
 import { LockOutlined, MailOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
-import axios from "axios";
 
 import { Link, useNavigate } from "react-router-dom";
 
@@ -10,10 +9,10 @@ const Register = () => {
   const onFinish = async (user) => {
     console.log("USER ::>>> ", user);
 
-    const res = await axios.post(
-      "https://user-sector-app.vercel.app/auth/signup",
-      user
-    );
+    // const res = await axios.post(
+    //   "https://user-sector-app.vercel.app/auth/signup",
+    //   user
+    // );
     // console.log("response :::>>>", res.data);
     navigate("/login");
   };
