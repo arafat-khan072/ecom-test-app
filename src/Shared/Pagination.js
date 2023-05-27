@@ -1,6 +1,6 @@
-import React from 'react';
-import { InertiaLink } from '@inertiajs/inertia-react';
 import classNames from 'classnames';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const PageLink = ({ active, label, url }) => {
   const className = classNames(
@@ -17,9 +17,9 @@ const PageLink = ({ active, label, url }) => {
     }
   );
   return (
-    <InertiaLink className={className} href={url}>
+    <Link className={className} to={url}>
       <span dangerouslySetInnerHTML={{ __html: label }}></span>
-    </InertiaLink>
+    </Link>
   );
 };
 
@@ -35,7 +35,7 @@ const PageInactive = ({ label }) => {
   );
 };
 
-export default ({ links = [] }) => {
+const Pagination = ({ links = [] }) => {
   // dont render, if there's only 1 page (previous, 1, next)
   if (links.length === 3) return null;
   return (
@@ -49,4 +49,6 @@ export default ({ links = [] }) => {
       })}
     </div>
   );
-};
+}
+
+export default Pagination;

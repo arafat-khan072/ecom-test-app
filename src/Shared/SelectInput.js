@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default ({
+const SelectInput = ({
   label,
   name,
   className,
@@ -27,3 +27,4 @@ export default ({
     </div>
   );
 };
+export default SelectInput;

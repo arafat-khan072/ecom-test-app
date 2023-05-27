@@ -1,7 +1,7 @@
-import React from 'react';
 import cx from 'classnames';
+import React from 'react';
 
-export default ({ loading, className, children, ...props }) => {
+const LoadingButton = ({ loading, className, children, ...props }) => {
   const classNames = cx(
     'flex items-center',
     'focus:outline-none',
@@ -17,3 +17,5 @@ export default ({ loading, className, children, ...props }) => {
     </button>
   );
 };
+
+export default LoadingButton;

@@ -1,24 +1,38 @@
-import { LockOutlined, MailOutlined } from "@ant-design/icons";
-import { Button, Form, Input } from "antd";
 import axios from "axios";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import LoadingButton from "../Shared/LoadingButton";
+import Logo from "../Shared/Logo";
+import TextInput from "../Shared/TextInput";
 import { AuthContext } from "../context/AuthProvider";
 
 const Login = () => {
   const { dispatch } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [values, setValues] = useState({
+    email: "",
+    password: "",
+    // remember: true,
+  });
 
-  const onFinish = async (user) => {
-    console.log("USER ::>>> ", user);
 
+  function handleChange(e) {
+    const key = e.target.name;
+    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+
+    setValues((values) => ({
+      ...values,
+      [key]: value,
+    }));
+  }
+
+  const onFinish = async (e) => {
+    e.preventDefault();
     const res = await axios.post(
       "http://127.0.0.1:8000/api/auth/login",
-      user
+      values
     );
-
     dispatch({ type: "LOGIN", payload: res.data });
-    console.log("response :::>>>", res.data);
     navigate("/dashboard");
   };
 
@@ -29,46 +43,47 @@ const Login = () => {
           className="block w-full max-w-xs mx-auto text-white fill-current"
           height={50}
         /> */}
-        <Form
-          name="normal_login"
-          className="login-form"
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-        >
-          <Form.Item
-            name="email"
-            rules={[
-              { required: true, message: "Please input your email!" },
-            ]}
-          >
-            <Input
-              prefix={<MailOutlined className="site-form-item-icon" />}
-              placeholder="email"
+        <form onSubmit={onFinish} className="bg-white rounded-lg shadow-xl overflow-hidden">
+          <div className="px-10 py-12">
+            <Logo className="block mx-auto max-w-xs mb-5" />
+            <h1 className="text-center font-bold text-3xl">Inventory Management System</h1>
+            <div className="mx-auto mt-6 w-24 border-b-2" />
+            <TextInput
+              className="mt-10"
+              label="Email"
+              name="email"
+              type="email"
+              // errors={errors.email}
+              value={values.email}
+              onChange={handleChange}
             />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[
-              { required: true, message: "Please input your Password!" },
-            ]}
-          >
-            <Input
-              prefix={<LockOutlined className="site-form-item-icon" />}
+            <TextInput
+              className="mt-6"
+              label="Password"
+              name="password"
               type="password"
-              placeholder="Password"
+              // errors={errors.password}
+              value={values.password}
+              onChange={handleChange}
             />
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="login-form-button- w-full bg-blue-500"
-            >
-              Log in
-            </Button>
-          </Form.Item>
-        </Form>
+            {/* <label className="mt-6 select-none flex items-center" htmlFor="remember">
+              <input name="remember" id="remember" className="mr-1" type="checkbox" checked={values.remember} onChange={handleChange} />
+              <span className="text-sm">Remember Me</span>
+            </label> */}
+          </div>
+          <div className="px-10 py-4 bg-lightBackground border-t border-border flex justify-end items-center">
+            {/* <a
+							className="hover:underline"
+							tabIndex="-1"
+							href="#reset-password"
+						>
+							Forget password?
+						</a> */}
+            <LoadingButton type="submit" className="btn-primary">
+              Login
+            </LoadingButton>
+          </div>
+        </form>
       </div>
     </div>
   );

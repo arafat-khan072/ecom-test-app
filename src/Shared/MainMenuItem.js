@@ -5,7 +5,6 @@ import Icon from '../Shared/Icon';
 
 const MainMenuItem = ({ icon, link, text }) => {
   const location = useLocation();
-  console.log(location.pathname);
   const isActive = (location.pathname == link) ? true : false;
 
   const iconClasses = classNames('w-4 h-4 mr-2', {
