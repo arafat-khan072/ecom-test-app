@@ -15,3 +15,14 @@ export const findValue = (val = null, options = []) => {
 
     return obj;
 };
+
+export const getQueryParam = (key = 'page') => {
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const page = urlSearchParams.get(key);
+
+    if (page && Number(page)) {
+        return page;
+    }
+
+    return '1';
+};

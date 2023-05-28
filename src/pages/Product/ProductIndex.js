@@ -1,13 +1,25 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { usePaginate } from "../../Hooks/Hooks";
+import { getQueryParam } from "../../Shared/Helpers";
 import Icon from "../../Shared/Icon";
 import Layout from "../../Shared/Layout";
 import Pagination from "../../Shared/Pagination";
+import { AxiosAPI } from "../../config/Api";
 
 const ProductIndex = () => {
+	const { collection, pageCount, currentPage, realPageNo, setPagination } =
+		usePaginate();
+	const [pageCountData, setPageCountData] = useState({
+		pageCount: 0,
+		perPage: 0,
+		currentPage: 0,
+	});
+	const [searchTerm, setSearchTerm] = useState("");
+	const navigate = useNavigate();
 	const [data, setData] = useState([]);
 	const [links, setLinks] = useState();
 	const [values, setValues] = useState({
@@ -15,6 +27,59 @@ const ProductIndex = () => {
 	});
 
 	const ACCESS_TOKEN = JSON.parse(localStorage.getItem('access_token'));
+	const fetchNewsList = useCallback(
+		(page = 1, searchTerm = false) => {
+			if (!searchTerm) {
+				AxiosAPI
+					.get(`/products?page=${page}`, {
+						headers: {
+							Authorization: `Bearer ${ACCESS_TOKEN.token}`
+						}
+					})
+					.then(({ data }) => {
+						setPagination(data.data);
+						setPageCountData((prev) => ({
+							...prev,
+							pageCount: data.data.last_page,
+							currentPage: data.data.current_page - 1,
+							perPage: data.data.per_page,
+						}));
+
+						setData(data);
+						navigate({
+							pathname: "/products",
+							search: `page=${page}`,
+						});
+					});
+			} else if (searchTerm) {
+				//console.log('searchTerm :>> ', searchTerm);
+				AxiosAPI
+					.get(
+						`/products?page=${page}`, {
+						headers: {
+							Authorization: `Bearer ${ACCESS_TOKEN.token}`
+						},
+						params: {
+							search: searchTerm
+						}
+					}
+					)
+					.then(({ data }) => {
+						setPagination(data.data);
+					});
+			}
+		},
+		[setPagination]
+	);
+
+	const handleClick = () => {
+		const page = getQueryParam("page");
+		fetchNewsList(page, searchTerm);
+	}
+	useEffect(() => {
+		fetchNewsList(1);
+	}, []);
+	//end
 	const getProducts = async () => {
 		const res = await axios.get(
 			"http://127.0.0.1:8000/api/products", {
@@ -26,21 +91,6 @@ const ProductIndex = () => {
 		setData(res.data.data)
 		setLinks(res.data.data.links)
 	};
-	const handleClick = () => {
-		const res = axios.get(
-			"http://127.0.0.1:8000/api/products", {
-			headers: { Authorization: `Bearer ${ACCESS_TOKEN.token}` },
-			params: {
-				search: values.search
-			}
-		}
-		).then((res2) => {
-			setData(res2.data.data)
-		});
-	}
-	useEffect(() => {
-		getProducts();
-	}, []);
 
 	function handleChange(e) {
 		const key = e.target.name;
@@ -53,17 +103,18 @@ const ProductIndex = () => {
 	}
 
 	function reset() {
-		getProducts();
-		setValues({
-			search: ''
-		});
+		setSearchTerm("");
+		const page = getQueryParam("page");
+		setTimeout(() => {
+			fetchNewsList(page);
+		}, 500);
 	}
 	return (
 		<Layout>
 			<div className="max-w-3xl">
-				<Helmet title={data?.data?.modelName} />
+				<Helmet title={data?.modelName} />
 				<ToastContainer />
-				<h1 className="mb-8 font-bold text-3xl">{data?.data?.modelName}</h1>
+				<h1 className="mb-8 font-bold text-3xl">{data?.modelName}</h1>
 				<div className="mb-6 flex justify-between items-center">
 					<div className="flex items-center w-full max-w-md mr-4">
 						<div className="relative flex w-full bg-white rounded shadow">
@@ -72,8 +123,8 @@ const ProductIndex = () => {
 								autoComplete="off"
 								type="text"
 								name="search"
-								value={values.search}
-								onChange={handleChange}
+								value={searchTerm}
+								onChange={(e) => setSearchTerm(e.target.value)}
 								placeholder="Search…"
 							/>
 						</div>
@@ -110,58 +161,56 @@ const ProductIndex = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{data?.data?.map(({ id, sl, name, category, stock_qty, price, status }) => {
-								return (
-									<React.Fragment key={id}>
-										<tr className="hover:bg-gray-100 focus-within:bg-gray-100">
-											<td className="border-t">
-												<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-													{sl}
-												</Link>
-											</td>
-											<td className="border-t">
-												<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-													{name}
-												</Link>
-											</td>
-											<td className="border-t">
-												<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-													{category}
-												</Link>
-											</td>
-											<td className="border-t">
-												<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-													{stock_qty}
-												</Link>
-											</td>
-											<td className="border-t">
-												<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-													{price}
-												</Link>
-											</td>
-											<td className="border-t">
-												<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-													{status}
-												</Link>
-											</td>
+							{collection && collection.length > 0
+								? collection.map(({ id, sl, name, category, stock_qty, price, status }) => {
+									return (
+										<React.Fragment key={id}>
+											<tr className="hover:bg-gray-100 focus-within:bg-gray-100">
+												<td className="border-t">
+													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{sl}
+													</Link>
+												</td>
+												<td className="border-t">
+													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{name}
+													</Link>
+												</td>
+												<td className="border-t">
+													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{category}
+													</Link>
+												</td>
+												<td className="border-t">
+													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{stock_qty}
+													</Link>
+												</td>
+												<td className="border-t">
+													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{price}
+													</Link>
+												</td>
+												<td className="border-t">
+													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{status}
+													</Link>
+												</td>
 
 
-											<td className="border-t w-px">
-												<Link tabIndex="-1" to={`/products/${id}`} className="px-4 flex items-center">
-													<Icon name="cheveron-right" className="block w-6 h-6 text-gray-400 fill-current" />
-												</Link>
-											</td>
-										</tr>
-									</React.Fragment>
-								);
-							})}
-							{data?.data?.length === 0 && (
-								<tr>
+												<td className="border-t w-px">
+													<Link tabIndex="-1" to={`/products/${id}`} className="px-4 flex items-center">
+														<Icon name="cheveron-right" className="block w-6 h-6 text-gray-400 fill-current" />
+													</Link>
+												</td>
+											</tr>
+										</React.Fragment>
+									);
+								}) : (<tr>
 									<td className="border-t px-6 py-4" colSpan="4">
 										No items found.
 									</td>
-								</tr>
-							)}
+								</tr>)}
 						</tbody>
 					</table>
 				</div>

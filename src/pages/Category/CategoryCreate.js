@@ -1,11 +1,11 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { Link, useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import Layout from "../../Shared/Layout";
 import LoadingButton from "../../Shared/LoadingButton";
+import { AxiosAPI } from "../../config/Api";
 import Form from "./CategoryForm";
 
 const CategoryCreate = () => {
@@ -20,8 +20,8 @@ const CategoryCreate = () => {
 
 	const ACCESS_TOKEN = JSON.parse(localStorage.getItem('access_token'));
 	const getCategoryData = async () => {
-		const res = await axios.get(
-			"http://127.0.0.1:8000/api/categories/create", {
+		const res = await AxiosAPI.get(
+			"/categories/create", {
 			headers: {
 				Authorization: `Bearer ${ACCESS_TOKEN.token}`
 			}
@@ -46,13 +46,13 @@ const CategoryCreate = () => {
 		e.preventDefault();
 		// setSending(true);
 
-		const res = axios.post(
-			"http://127.0.0.1:8000/api/categories", { ...values }, {
+		const res = AxiosAPI.post(
+			"/categories", { ...values }, {
 			headers: { Authorization: `Bearer ${ACCESS_TOKEN.token}` },
 		}
 		).then((res2) => {
 			if (res2.status == 200) {
-				navigate('/categories');
+				navigate('/categories?page=1');
 				toast.success("Category created successfully");
 			}
 		}).catch((e) => {
@@ -68,7 +68,6 @@ const CategoryCreate = () => {
 			<div>
 				<Helmet title={`Create ${data?.modelName}`} />
 				<div>
-					<ToastContainer />
 					<h1 className="mb-8 font-bold text-3xl">
 						<Link to="/categories" className="text-primary hover:text-secondary">
 							{data?.modelName}

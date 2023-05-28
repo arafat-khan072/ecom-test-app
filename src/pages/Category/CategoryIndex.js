@@ -1,59 +1,89 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { usePaginate } from "../../Hooks/Hooks";
+import CMSPaginate from "../../Shared/CMSPaginate";
+import { getQueryParam } from "../../Shared/Helpers";
 import Icon from "../../Shared/Icon";
 import Layout from "../../Shared/Layout";
+import { AxiosAPI } from "../../config/Api";
 
 const CategoryIndex = () => {
-	const [data, setData] = useState([]);
-	const [values, setValues] = useState({
-		search: ''
+
+	const { collection, pageCount, currentPage, realPageNo, setPagination } =
+		usePaginate();
+	const [pageCountData, setPageCountData] = useState({
+		pageCount: 0,
+		perPage: 0,
+		currentPage: 0,
 	});
+	const [searchTerm, setSearchTerm] = useState("");
+	const [data, setData] = useState([]);
+	const navigate = useNavigate();
 	const ACCESS_TOKEN = JSON.parse(localStorage.getItem('access_token'));
-	const getCategories = async () => {
-		const res = await axios.get(
-			"http://127.0.0.1:8000/api/categories", {
-			headers: {
-				Authorization: `Bearer ${ACCESS_TOKEN.token}`
+
+	const fetchNewsList = useCallback(
+		(page = 1, searchTerm = false) => {
+			if (!searchTerm) {
+				AxiosAPI
+					.get(`/categories?page=${page}`, {
+						headers: {
+							Authorization: `Bearer ${ACCESS_TOKEN.token}`
+						}
+					})
+					.then(({ data }) => {
+						setPagination(data.data);
+						setPageCountData((prev) => ({
+							...prev,
+							pageCount: data.data.last_page,
+							currentPage: data.data.current_page - 1,
+							perPage: data.data.per_page,
+						}));
+
+						setData(data);
+						navigate({
+							pathname: "/categories",
+							search: `page=${page}`,
+						});
+					});
+			} else if (searchTerm) {
+				//console.log('searchTerm :>> ', searchTerm);
+				AxiosAPI
+					.get(
+						`/categories?page=${page}`, {
+						headers: {
+							Authorization: `Bearer ${ACCESS_TOKEN.token}`
+						},
+						params: {
+							search: searchTerm
+						}
+					}
+					)
+					.then(({ data }) => {
+						setPagination(data.data);
+					});
 			}
-		}
-		);
-		setData(res.data)
-	};
+		},
+		[setPagination]
+	);
+
 	const handleClick = () => {
-		const res = axios.get(
-			"http://127.0.0.1:8000/api/categories", {
-			headers: { Authorization: `Bearer ${ACCESS_TOKEN.token}` },
-			params: {
-				search: values.search
-			}
-		}
-		).then((res2) => {
-			setData(res2.data)
-		});
+		const page = getQueryParam("page");
+		fetchNewsList(page, searchTerm);
 	}
 	useEffect(() => {
-		getCategories();
+		fetchNewsList(1);
 	}, []);
 
-	function handleChange(e) {
-		const key = e.target.name;
-		const value = e.target.value;
-
-		setValues(values => ({
-			...values,
-			[key]: value
-		}));
-	}
-
 	function reset() {
-		getCategories();
-		setValues({
-			search: ''
-		});
+		setSearchTerm("");
+		const page = getQueryParam("page");
+		setTimeout(() => {
+			fetchNewsList(page);
+		}, 500);
 	}
+
 	return (
 		<Layout>
 			<div className="max-w-3xl">
@@ -68,8 +98,8 @@ const CategoryIndex = () => {
 								autoComplete="off"
 								type="text"
 								name="search"
-								value={values.search}
-								onChange={handleChange}
+								value={searchTerm}
+								onChange={(e) => setSearchTerm(e.target.value)}
 								placeholder="Search…"
 							/>
 						</div>
@@ -103,47 +133,57 @@ const CategoryIndex = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{data?.data?.map(({ id, sl, name, status }) => {
-								return (
-									<React.Fragment key={id}>
-										<tr className="hover:bg-gray-100 focus-within:bg-gray-100">
-											<td className="border-t">
-												<Link to={`/categories/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-													{sl}
-												</Link>
-											</td>
-											<td className="border-t">
-												<Link to={`/categories/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-													{name}
-												</Link>
-											</td>
-											<td className="border-t">
-												<Link to={`/categories/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-													{status}
-												</Link>
-											</td>
+							{collection && collection.length > 0
+								? collection.map(({ id, sl, name, status }) => {
+									return (
+										<React.Fragment key={id}>
+											<tr className="hover:bg-gray-100 focus-within:bg-gray-100">
+												<td className="border-t">
+													<Link to={`/categories/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{sl}
+													</Link>
+												</td>
+												<td className="border-t">
+													<Link to={`/categories/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{name}
+													</Link>
+												</td>
+												<td className="border-t">
+													<Link to={`/categories/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{status}
+													</Link>
+												</td>
 
 
-											<td className="border-t w-px">
-												<Link tabIndex="-1" to={`/categories/${id}`} className="px-4 flex items-center">
-													<Icon name="cheveron-right" className="block w-6 h-6 text-gray-400 fill-current" />
-												</Link>
-											</td>
-										</tr>
-									</React.Fragment>
-								);
-							})}
-							{data?.data?.length === 0 && (
+												<td className="border-t w-px">
+													<Link tabIndex="-1" to={`/categories/${id}`} className="px-4 flex items-center">
+														<Icon name="cheveron-right" className="block w-6 h-6 text-gray-400 fill-current" />
+													</Link>
+												</td>
+											</tr>
+										</React.Fragment>
+									);
+								}) : (<tr>
+									<td className="border-t px-6 py-4" colSpan="4">
+										No items found.
+									</td>
+								</tr>)}
+							{/* {collection && collection.length > 0 && (
 								<tr>
 									<td className="border-t px-6 py-4" colSpan="4">
 										No items found.
 									</td>
 								</tr>
-							)}
+							)} */}
 						</tbody>
 					</table>
 				</div>
-				{/* <Pagination links={links} /> */}
+
+				<CMSPaginate
+					pageCount={pageCount}
+					onPageChange={(page) => fetchNewsList(page)}
+					currentPage={currentPage}
+				/>
 			</div>
 		</Layout>
 	);

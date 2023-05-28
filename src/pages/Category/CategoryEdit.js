@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Helmet from "react-helmet";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -6,6 +5,7 @@ import { toast } from "react-toastify";
 import DeleteButton from "../../Shared/DeleteButton";
 import Layout from "../../Shared/Layout";
 import LoadingButton from "../../Shared/LoadingButton";
+import { AxiosAPI } from "../../config/Api";
 import Form from "./CategoryForm";
 
 const CategoryEdit = () => {
@@ -21,8 +21,8 @@ const CategoryEdit = () => {
 	const ID = params.id;
 	const ACCESS_TOKEN = JSON.parse(localStorage.getItem('access_token'));
 	const getCategoryById = async (ID) => {
-		const res = await axios.get(
-			`http://127.0.0.1:8000/api/categories/${ID}/edit`, {
+		const res = await AxiosAPI.get(
+			`/categories/${ID}/edit`, {
 			headers: {
 				Authorization: `Bearer ${ACCESS_TOKEN.token}`
 			}
@@ -53,13 +53,13 @@ const CategoryEdit = () => {
 		e.preventDefault();
 		setSending(true);
 
-		const res = axios.put(
-			`http://127.0.0.1:8000/api/categories/${ID}`, { ...values }, {
+		const res = AxiosAPI.put(
+			`/categories/${ID}`, { ...values }, {
 			headers: { Authorization: `Bearer ${ACCESS_TOKEN.token}` },
 		}
 		).then((res2) => {
 			if (res2.status == 200) {
-				navigate('/categories');
+				navigate('/categories?page=1');
 				toast.success("Category updated successfully");
 			}
 		}).catch((e) => {
@@ -72,14 +72,14 @@ const CategoryEdit = () => {
 	function destroy() {
 
 		if (window.confirm("Are you sure you want to delete this item?")) {
-			const res = axios.delete(
-				`http://127.0.0.1:8000/api/categories/${ID}`, {
+			const res = AxiosAPI.delete(
+				`/categories/${ID}`, {
 				headers: { Authorization: `Bearer ${ACCESS_TOKEN.token}` },
 			}
 			).then((res2) => {
 				console.log(res2);
 				if (res2.status == 200) {
-					navigate('/categories');
+					navigate('/categories?page=1');
 					toast.success("Category deleted successfully");
 				}
 			}).catch((e) => {
