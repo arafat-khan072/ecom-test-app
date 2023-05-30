@@ -6,26 +6,25 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import Layout from "../../Shared/Layout";
 import LoadingButton from "../../Shared/LoadingButton";
-import Form from "./ProductForm";
+import Form from "./PurchaseForm";
 
-const ProductCreate = () => {
+const PurchaseCreate = () => {
 	const [data, setData] = useState([]);
 	const [sending, setSending] = useState(false);
 	const [errors, setErrors] = useState([]);
 	const navigate = useNavigate();
 	const [values, setValues] = useState({
-		code: "",
-		name: "",
-		category: "",
-		stock_qty: "",
-		price: "",
-		status: "1",
+		supplier: "",
+		product: "",
+		product_qty: "",
+		product_price: "",
+		purchase_date: "",
 	});
 
 	const ACCESS_TOKEN = JSON.parse(localStorage.getItem('access_token'));
 	const getProductData = async () => {
 		const res = await axios.get(
-			"http://127.0.0.1:8000/api/products/create", {
+			"http://127.0.0.1:8000/api/purchases/create", {
 			headers: {
 				Authorization: `Bearer ${ACCESS_TOKEN.token}`
 			}
@@ -51,13 +50,13 @@ const ProductCreate = () => {
 		setSending(true);
 
 		const res = axios.post(
-			"http://127.0.0.1:8000/api/products", { ...values }, {
+			"http://127.0.0.1:8000/api/purchases", { ...values }, {
 			headers: { Authorization: `Bearer ${ACCESS_TOKEN.token}` },
 		}
 		).then((res2) => {
 			if (res2.status == 200) {
-				navigate('/products');
-				toast.success("Product created successfully");
+				navigate('/purchases');
+				toast.success("Purchasesd item successfully");
 			}
 		}).catch((e) => {
 			if (e.response.status == 422) {
@@ -72,7 +71,7 @@ const ProductCreate = () => {
 				<Helmet title={`Create ${data?.modelName}`} />
 				<div>
 					<h1 className="mb-8 font-bold text-3xl">
-						<Link to="/products" className="text-primary hover:text-secondary">
+						<Link to="/purchases" className="text-primary hover:text-secondary">
 							{data?.modelName}
 						</Link>
 						<span className="text-primary font-medium"> /</span> Create
@@ -99,4 +98,4 @@ const ProductCreate = () => {
 		</Layout>
 	);
 };
-export default ProductCreate;
+export default PurchaseCreate;

@@ -1,6 +1,13 @@
-import React from 'react';
+import React from "react";
 
-export default ({ label, name, className, errors = [], ...props }) => {
+const TextInput = ({
+  multiline = false,
+  label,
+  name,
+  className,
+  errors = [],
+  ...props
+}) => {
   return (
     <div className={className}>
       {label && (
@@ -8,13 +15,24 @@ export default ({ label, name, className, errors = [], ...props }) => {
           {label}:
         </label>
       )}
-      <input
-        id={name}
-        name={name}
-        {...props}
-        className={`form-input ${errors.length ? 'error' : ''}`}
-      />
+      {multiline ? (
+        <textarea
+          id={name}
+          name={name}
+          {...props}
+          className={`form-input ${errors.length ? "error" : ""}`}
+        />
+      ) : (
+        <input
+          id={name}
+          name={name}
+          {...props}
+          className={`form-input ${errors.length ? "error" : ""}`}
+        />
+      )}
+
       {errors && <div className="form-error">{errors}</div>}
     </div>
   );
-};
+}
+export default TextInput;

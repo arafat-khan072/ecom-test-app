@@ -9,7 +9,8 @@ import Icon from "../../Shared/Icon";
 import Layout from "../../Shared/Layout";
 import { AxiosAPI } from "../../config/Api";
 
-const ProductIndex = () => {
+const SupplierIndex = () => {
+
 	const { collection, pageCount, currentPage, realPageNo, setPagination } =
 		usePaginate();
 	const [pageCountData, setPageCountData] = useState({
@@ -18,18 +19,15 @@ const ProductIndex = () => {
 		currentPage: 0,
 	});
 	const [searchTerm, setSearchTerm] = useState("");
-	const navigate = useNavigate();
 	const [data, setData] = useState([]);
-	const [values, setValues] = useState({
-		search: ''
-	});
-
+	const navigate = useNavigate();
 	const ACCESS_TOKEN = JSON.parse(localStorage.getItem('access_token'));
+
 	const fetchNewsList = useCallback(
 		(page = 1, searchTerm = false) => {
 			if (!searchTerm) {
 				AxiosAPI
-					.get(`/products?page=${page}`, {
+					.get(`/suppliers?page=${page}`, {
 						headers: {
 							Authorization: `Bearer ${ACCESS_TOKEN.token}`
 						}
@@ -45,7 +43,7 @@ const ProductIndex = () => {
 
 						setData(data);
 						navigate({
-							pathname: "/products",
+							pathname: "/suppliers",
 							search: `page=${page}`,
 						});
 					});
@@ -53,7 +51,7 @@ const ProductIndex = () => {
 				//console.log('searchTerm :>> ', searchTerm);
 				AxiosAPI
 					.get(
-						`/products?page=${page}`, {
+						`/suppliers?page=${page}`, {
 						headers: {
 							Authorization: `Bearer ${ACCESS_TOKEN.token}`
 						},
@@ -78,16 +76,6 @@ const ProductIndex = () => {
 		fetchNewsList(1);
 	}, []);
 
-	function handleChange(e) {
-		const key = e.target.name;
-		const value = e.target.value;
-
-		setValues(values => ({
-			...values,
-			[key]: value
-		}));
-	}
-
 	function reset() {
 		setSearchTerm("");
 		const page = getQueryParam("page");
@@ -95,6 +83,7 @@ const ProductIndex = () => {
 			fetchNewsList(page);
 		}, 500);
 	}
+
 	return (
 		<Layout>
 			<div className="max-w-3xl">
@@ -129,7 +118,7 @@ const ProductIndex = () => {
 							search
 						</button>
 					</div>
-					<Link className="btn-primary" to="/products/create">
+					<Link className="btn-primary" to="/suppliers/create">
 						<span>Create</span>
 						<span className="hidden md:inline"> New</span>
 					</Link>
@@ -140,52 +129,40 @@ const ProductIndex = () => {
 							<tr className="text-left font-bold">
 								<th className="px-6 pt-5 pb-4">Sl</th>
 								<th className="px-6 pt-5 pb-4">Name</th>
-								<th className="px-6 pt-5 pb-4">Category</th>
-								<th className="px-6 pt-5 pb-4">Stock</th>
-								<th className="px-6 pt-5 pb-4">Price</th>
-								<th className="px-6 pt-5 pb-4">Status</th>
+								<th className="px-6 pt-5 pb-4">Phone</th>
+								<th className="px-6 pt-5 pb-4">Address</th>
 							</tr>
 						</thead>
 						<tbody>
 							{collection && collection.length > 0
-								? collection.map(({ id, sl, name, category, stock_qty, price, status }) => {
+								? collection.map(({ id, sl, name, phone, address }) => {
 									return (
 										<React.Fragment key={id}>
 											<tr className="hover:bg-gray-100 focus-within:bg-gray-100">
 												<td className="border-t">
-													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+													<Link to={`/suppliers/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
 														{sl}
 													</Link>
 												</td>
 												<td className="border-t">
-													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+													<Link to={`/suppliers/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
 														{name}
 													</Link>
 												</td>
 												<td className="border-t">
-													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-														{category}
+													<Link to={`/suppliers/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{phone}
 													</Link>
 												</td>
 												<td className="border-t">
-													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-														{stock_qty}
-													</Link>
-												</td>
-												<td className="border-t">
-													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-														{price}
-													</Link>
-												</td>
-												<td className="border-t">
-													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-														{status}
+													<Link to={`/suppliers/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{address}
 													</Link>
 												</td>
 
 
 												<td className="border-t w-px">
-													<Link tabIndex="-1" to={`/products/${id}`} className="px-4 flex items-center">
+													<Link tabIndex="-1" to={`/suppliers/${id}`} className="px-4 flex items-center">
 														<Icon name="cheveron-right" className="block w-6 h-6 text-gray-400 fill-current" />
 													</Link>
 												</td>
@@ -200,6 +177,7 @@ const ProductIndex = () => {
 						</tbody>
 					</table>
 				</div>
+
 				<CMSPaginate
 					pageCount={pageCount}
 					onPageChange={(page) => fetchNewsList(page)}
@@ -209,4 +187,4 @@ const ProductIndex = () => {
 		</Layout>
 	);
 };
-export default ProductIndex;
+export default SupplierIndex;

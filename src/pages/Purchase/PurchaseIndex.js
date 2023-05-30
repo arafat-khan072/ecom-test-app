@@ -9,7 +9,7 @@ import Icon from "../../Shared/Icon";
 import Layout from "../../Shared/Layout";
 import { AxiosAPI } from "../../config/Api";
 
-const ProductIndex = () => {
+const PurchaseIndex = () => {
 	const { collection, pageCount, currentPage, realPageNo, setPagination } =
 		usePaginate();
 	const [pageCountData, setPageCountData] = useState({
@@ -29,7 +29,7 @@ const ProductIndex = () => {
 		(page = 1, searchTerm = false) => {
 			if (!searchTerm) {
 				AxiosAPI
-					.get(`/products?page=${page}`, {
+					.get(`/purchases?page=${page}`, {
 						headers: {
 							Authorization: `Bearer ${ACCESS_TOKEN.token}`
 						}
@@ -45,7 +45,7 @@ const ProductIndex = () => {
 
 						setData(data);
 						navigate({
-							pathname: "/products",
+							pathname: "/purchases",
 							search: `page=${page}`,
 						});
 					});
@@ -53,7 +53,7 @@ const ProductIndex = () => {
 				//console.log('searchTerm :>> ', searchTerm);
 				AxiosAPI
 					.get(
-						`/products?page=${page}`, {
+						`/purchases?page=${page}`, {
 						headers: {
 							Authorization: `Bearer ${ACCESS_TOKEN.token}`
 						},
@@ -97,7 +97,7 @@ const ProductIndex = () => {
 	}
 	return (
 		<Layout>
-			<div className="max-w-3xl">
+			<div className="max-w-7xl">
 				<Helmet title={data?.modelName} />
 				<ToastContainer />
 				<h1 className="mb-8 font-bold text-3xl">{data?.modelName}</h1>
@@ -129,7 +129,7 @@ const ProductIndex = () => {
 							search
 						</button>
 					</div>
-					<Link className="btn-primary" to="/products/create">
+					<Link className="btn-primary" to="/purchases/create">
 						<span>Create</span>
 						<span className="hidden md:inline"> New</span>
 					</Link>
@@ -139,53 +139,65 @@ const ProductIndex = () => {
 						<thead>
 							<tr className="text-left font-bold">
 								<th className="px-6 pt-5 pb-4">Sl</th>
-								<th className="px-6 pt-5 pb-4">Name</th>
-								<th className="px-6 pt-5 pb-4">Category</th>
-								<th className="px-6 pt-5 pb-4">Stock</th>
-								<th className="px-6 pt-5 pb-4">Price</th>
-								<th className="px-6 pt-5 pb-4">Status</th>
+								<th className="px-6 pt-5 pb-4">Invoice No</th>
+								<th className="px-6 pt-5 pb-4">Supplier</th>
+								<th className="px-6 pt-5 pb-4">Product</th>
+								<th className="px-6 pt-5 pb-4">Product Quantity</th>
+								<th className="px-6 pt-5 pb-4">Product Price</th>
+								<th className="px-6 pt-5 pb-4">Total Price</th>
+								<th className="px-6 pt-5 pb-4">Purchase date</th>
 							</tr>
 						</thead>
 						<tbody>
 							{collection && collection.length > 0
-								? collection.map(({ id, sl, name, category, stock_qty, price, status }) => {
+								? collection.map(({ id, sl, invoice_no, supplier, product, product_qty, product_price, total_price, purchase_date }) => {
 									return (
 										<React.Fragment key={id}>
 											<tr className="hover:bg-gray-100 focus-within:bg-gray-100">
 												<td className="border-t">
-													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+													<Link to={`/purchases/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
 														{sl}
 													</Link>
 												</td>
 												<td className="border-t">
-													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-														{name}
+													<Link to={`/purchases/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{invoice_no}
 													</Link>
 												</td>
 												<td className="border-t">
-													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-														{category}
+													<Link to={`/purchases/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{supplier}
 													</Link>
 												</td>
 												<td className="border-t">
-													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-														{stock_qty}
+													<Link to={`/purchases/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{product}
 													</Link>
 												</td>
 												<td className="border-t">
-													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-														{price}
+													<Link to={`/purchases/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{product_qty}
 													</Link>
 												</td>
 												<td className="border-t">
-													<Link to={`/products/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-														{status}
+													<Link to={`/purchases/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{product_price}
+													</Link>
+												</td>
+												<td className="border-t">
+													<Link to={`/purchases/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{total_price}
+													</Link>
+												</td>
+												<td className="border-t">
+													<Link to={`/purchases/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
+														{purchase_date}
 													</Link>
 												</td>
 
 
 												<td className="border-t w-px">
-													<Link tabIndex="-1" to={`/products/${id}`} className="px-4 flex items-center">
+													<Link tabIndex="-1" to={`/purchases/${id}`} className="px-4 flex items-center">
 														<Icon name="cheveron-right" className="block w-6 h-6 text-gray-400 fill-current" />
 													</Link>
 												</td>
@@ -209,4 +221,4 @@ const ProductIndex = () => {
 		</Layout>
 	);
 };
-export default ProductIndex;
+export default PurchaseIndex;

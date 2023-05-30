@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,26 +5,24 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import Layout from "../../Shared/Layout";
 import LoadingButton from "../../Shared/LoadingButton";
-import Form from "./ProductForm";
+import { AxiosAPI } from "../../config/Api";
+import Form from "./SupplierForm";
 
-const ProductCreate = () => {
+const SupplierCreate = () => {
 	const [data, setData] = useState([]);
 	const [sending, setSending] = useState(false);
 	const [errors, setErrors] = useState([]);
 	const navigate = useNavigate();
 	const [values, setValues] = useState({
-		code: "",
 		name: "",
-		category: "",
-		stock_qty: "",
-		price: "",
-		status: "1",
+		phone: "",
+		address: "",
 	});
 
 	const ACCESS_TOKEN = JSON.parse(localStorage.getItem('access_token'));
-	const getProductData = async () => {
-		const res = await axios.get(
-			"http://127.0.0.1:8000/api/products/create", {
+	const getSupplierData = async () => {
+		const res = await AxiosAPI.get(
+			"/suppliers/create", {
 			headers: {
 				Authorization: `Bearer ${ACCESS_TOKEN.token}`
 			}
@@ -35,8 +32,9 @@ const ProductCreate = () => {
 	};
 
 	useEffect(() => {
-		getProductData();
+		getSupplierData();
 	}, []);
+
 	function handleChange(e) {
 		const key = e.target.name;
 		const value = e.target.value;
@@ -48,16 +46,16 @@ const ProductCreate = () => {
 
 	function handleSubmit(e) {
 		e.preventDefault();
-		setSending(true);
+		// setSending(true);
 
-		const res = axios.post(
-			"http://127.0.0.1:8000/api/products", { ...values }, {
+		const res = AxiosAPI.post(
+			"/suppliers", { ...values }, {
 			headers: { Authorization: `Bearer ${ACCESS_TOKEN.token}` },
 		}
 		).then((res2) => {
 			if (res2.status == 200) {
-				navigate('/products');
-				toast.success("Product created successfully");
+				navigate('/suppliers?page=1');
+				toast.success("Supplier created successfully");
 			}
 		}).catch((e) => {
 			if (e.response.status == 422) {
@@ -66,13 +64,14 @@ const ProductCreate = () => {
 		});
 
 	}
+
 	return (
 		<Layout>
 			<div>
 				<Helmet title={`Create ${data?.modelName}`} />
 				<div>
 					<h1 className="mb-8 font-bold text-3xl">
-						<Link to="/products" className="text-primary hover:text-secondary">
+						<Link to="/suppliers" className="text-primary hover:text-secondary">
 							{data?.modelName}
 						</Link>
 						<span className="text-primary font-medium"> /</span> Create
@@ -86,7 +85,6 @@ const ProductCreate = () => {
 							errors={errors}
 							handleSubmit={handleSubmit}
 							handleChange={handleChange}
-							extraData={data.extraData}
 						/>
 						<div className="px-8 py-4 bg-gray-100 border-t border-gray-200 flex justify-end items-center">
 							<LoadingButton loading={sending} type="submit" className="btn-primary">
@@ -99,4 +97,4 @@ const ProductCreate = () => {
 		</Layout>
 	);
 };
-export default ProductCreate;
+export default SupplierCreate;

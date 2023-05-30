@@ -1,3 +1,14 @@
+import { format } from "date-fns";
+
+export const formatDateTime = (dateTime = "", dateFormat = "dd/MM/yyyy, p") => {
+    if (dateTime) {
+        let date = format(new Date(dateTime), dateFormat);
+        return date;
+    } else {
+        return "";
+    }
+};
+
 export const findValue = (val = null, options = []) => {
     let obj = null;
     if (val && (val.constructor.name == "String" || val.constructor.name == "Number")) {
