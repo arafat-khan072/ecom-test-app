@@ -141,16 +141,14 @@ const PurchaseIndex = () => {
 								<th className="px-6 pt-5 pb-4">Sl</th>
 								<th className="px-6 pt-5 pb-4">Invoice No</th>
 								<th className="px-6 pt-5 pb-4">Supplier</th>
-								<th className="px-6 pt-5 pb-4">Product</th>
-								<th className="px-6 pt-5 pb-4">Product Quantity</th>
-								<th className="px-6 pt-5 pb-4">Product Price</th>
+								<th className="px-6 pt-5 pb-4">Products</th>
 								<th className="px-6 pt-5 pb-4">Total Price</th>
 								<th className="px-6 pt-5 pb-4">Purchase date</th>
 							</tr>
 						</thead>
 						<tbody>
 							{collection && collection.length > 0
-								? collection.map(({ id, sl, invoice_no, supplier, product, product_qty, product_price, total_price, purchase_date }) => {
+								? collection.map(({ id, sl, invoice_no, supplier, products, total_price, purchase_date }) => {
 									return (
 										<React.Fragment key={id}>
 											<tr className="hover:bg-gray-100 focus-within:bg-gray-100">
@@ -171,17 +169,14 @@ const PurchaseIndex = () => {
 												</td>
 												<td className="border-t">
 													<Link to={`/purchases/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-														{product}
-													</Link>
-												</td>
-												<td className="border-t">
-													<Link to={`/purchases/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-														{product_qty}
-													</Link>
-												</td>
-												<td className="border-t">
-													<Link to={`/purchases/${id}`} className="px-6 py-4 flex items-center focus:text-secondary">
-														{product_price}
+														{products.map((i) => {
+															return (
+																<>
+																	<span>{i.product_name} </span>
+																	&nbsp;&nbsp;&nbsp;
+																</>
+															)
+														})}
 													</Link>
 												</td>
 												<td className="border-t">
