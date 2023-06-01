@@ -9,9 +9,6 @@ const MainMenu = ({ className }) => {
       <MainMenuItem text="Product" link="/products" icon="dashboard" />
       <MainMenuItem text="Supplier" link="/suppliers" icon="dashboard" />
       <MainMenuItem text="Purchase" link="/purchases" icon="dashboard" />
-      <MainMenuItem text="Organizations" link="/organization" icon="office" />
-      <MainMenuItem text="Contacts" link="#" icon="users" />
-      <MainMenuItem text="Reports" link="#" icon="printer" />
     </div>
   );
 };

@@ -147,7 +147,6 @@ const PurchaseCreate = () => {
 	}
 
 
-	console.log('data', values)
 	return (
 		<Layout>
 			<div>

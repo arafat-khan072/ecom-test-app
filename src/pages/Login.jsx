@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import LoadingButton from "../Shared/LoadingButton";
 import Logo from "../Shared/Logo";
 import TextInput from "../Shared/TextInput";
@@ -9,6 +10,7 @@ import { AuthContext } from "../context/AuthProvider";
 const Login = () => {
   const { dispatch } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [errors, setErrors] = useState([]);
   const [values, setValues] = useState({
     email: "",
     password: "",
@@ -28,12 +30,21 @@ const Login = () => {
 
   const onFinish = async (e) => {
     e.preventDefault();
-    const res = await axios.post(
-      "http://127.0.0.1:8000/api/auth/login",
-      values
-    );
-    dispatch({ type: "LOGIN", payload: res.data });
-    navigate("/dashboard");
+    try {
+      const res = await axios.post(
+        "http://127.0.0.1:8001/api/auth/login",
+        values
+      );
+
+      dispatch({ type: "LOGIN", payload: res.data });
+      navigate("/dashboard");
+      toast.success("Successfully logged in")
+    } catch (e) {
+      console.log('eee', e)
+      if (e.response.data.status == 401) {
+        setErrors(e.response.data.message)
+      }
+    };
   };
 
   return (

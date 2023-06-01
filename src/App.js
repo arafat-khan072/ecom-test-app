@@ -16,7 +16,7 @@ import CategoryCreate from "./pages/Category/CategoryCreate";
 import CategoryEdit from "./pages/Category/CategoryEdit";
 import CategoryIndex from "./pages/Category/CategoryIndex";
 import Dashboard from "./pages/Dashboard";
-import Home from "./pages/Home";
+import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 import Organization from "./pages/Organization";
 import ProductCreate from "./pages/Product/ProductCreate";
@@ -46,7 +46,7 @@ function App() {
             path={`/`}
             element={
               <RequireAuth>
-                <Home />
+                <HomePage />
               </RequireAuth>
             }
           />
